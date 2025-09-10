@@ -48,14 +48,13 @@ const server = http.createServer((request, res) =>{
             res.writeHead(400, {'Content-Type': 'application/json'});
             return res.end(JSON.stringify({message: "Invalid JSON format"}));
         }
-        const {taskName, taskDescription, finish, dateCreate} = data;
+        const {taskName, taskDescription, finish} = data;
         const taskToUpdate = tasks.find((t) => t.id === id);
 
         if(taskToUpdate){
             taskToUpdate.taskName = taskName;
             taskToUpdate.taskDescription = taskDescription;
             taskToUpdate.finish = finish;
-            taskToUpdate.dateCreate = dateCreate;   
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify(taskToUpdate));
         }else{
@@ -63,7 +62,19 @@ const server = http.createServer((request, res) =>{
             res.end(JSON.stringify({message: 'Task not found '}));
         }
         }
+        //Criação do metodo DELETE
+        else if(url.startsWith("/tasks/") && method === "DELETE"){
+            const index = tasks.findIndex((t) => t.id === id);
 
+            if(index !== -1){
+                tasks.splice(index, 1);
+                res.writeHead(204);
+                res.end();
+            }else{
+                res.writeHead(404, {'content-type': 'application/json'});
+                res.end(JSON.stringify({message: 'Task not found'}));
+            }
+        }
         //Caso a rota nao seja encontrada
         else{
             res.writeHead(404, {'content-type': 'application/json'});
